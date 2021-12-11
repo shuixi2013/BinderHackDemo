@@ -43,6 +43,10 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
+
+                System.loadLibrary("binderhack");
+                MainActivity.start();
+                getPackageManager().getInstalledApplications(0);
             }
         });
     }
@@ -75,4 +79,12 @@ public class MainActivity extends AppCompatActivity {
         return NavigationUI.navigateUp(navController, appBarConfiguration)
                 || super.onSupportNavigateUp();
     }
+
+    private static boolean transactStart(Object interfaceName, Object funcName, Parcel data, Parcel reply) {
+        Log.d("WHULZZ", String.format("%s %s", interfaceName, funcName));
+        return false;
+    }
+
+    private static native void start();
+    private static native void end();
 }
