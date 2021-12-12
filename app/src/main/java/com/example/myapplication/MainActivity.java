@@ -4,6 +4,7 @@ import android.os.Bundle;
 
 import com.google.android.material.snackbar.Snackbar;
 
+import androidx.annotation.Keep;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Parcel;
@@ -19,6 +20,10 @@ import com.example.myapplication.databinding.ActivityMainBinding;
 
 import android.view.Menu;
 import android.view.MenuItem;
+
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -80,11 +85,66 @@ public class MainActivity extends AppCompatActivity {
                 || super.onSupportNavigateUp();
     }
 
+    /**
+     * This function is not necessary!
+     * If not provided, binderhack will print all the binder calls.
+     * This function will be called by native-c code.
+     *
+     * @return HashMap<String, Set<String>>. see demo below for detail
+     */
+    @Keep
+    private static HashMap getInterestBinders() {
+        HashMap<String, Set<String>> monitorBinderMap = new HashMap<>();
+        HashSet<String> amFuncs = new HashSet<>();
+        amFuncs.add("activityPaused");
+        amFuncs.add("updateConfiguration");
+        amFuncs.add("checkPermission");
+        amFuncs.add("startActivityAsUser");
+
+        monitorBinderMap.put("android.app.IActivityManager", amFuncs);
+
+        HashSet<String> pmFuncs = new HashSet<>();
+        pmFuncs.add("getInstalledApplications");
+        monitorBinderMap.put("android.content.pm.IPackageManager", pmFuncs);
+        return monitorBinderMap;
+    }
+
+    /**
+     *
+     * @param interfaceName likely as android.content.pm.IPackageManager
+     * @param funcName likely as getInstalledApplications
+     * @param data see {@link android.os.IBinder}->transact(...)
+     * @param reply see {@link android.os.IBinder}->transact(...)
+     * @return TRUE represents you've decided to intercept the origin call.
+     */
+    @Keep
     private static boolean transactStart(Object interfaceName, Object funcName, Parcel data, Parcel reply) {
-        Log.d("WHULZZ", String.format("%s %s", interfaceName, funcName));
+        Log.d("WHULZZ", String.format("transactStart %s %s", interfaceName, funcName));
         return false;
     }
 
+    /**
+     *
+     * @param interfaceName likely as android.content.pm.IPackageManager
+     * @param funcName likely as getInstalledApplications
+     * @param data see {@link android.os.IBinder}->transact(...)
+     * @param reply reply see {@link android.os.IBinder}->transact(...)
+     * @param originRet this is the origin result
+     * @return I advice you to use {@param originRet}
+     */
+    @Keep
+    private static boolean transactEnd(Object interfaceName, Object funcName, Parcel data, Parcel reply, boolean originRet) {
+        Log.d("WHULZZ", String.format("transactEnd %s %s", interfaceName, funcName));
+        return originRet;
+    }
+
+    /**
+     * start binder monitor
+     */
     private static native void start();
+
+    /**
+     * end binder monitor
+     */
     private static native void end();
 }
