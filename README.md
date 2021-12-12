@@ -54,9 +54,7 @@ com.example.myapplication D/WHULZZ: com.android.internal.view.IInputMethodManage
 
 ### 1.必须在您的apk资源目录中提供bm.properties文件，并定义BinderCareEntry
 
-![image-20211212122519265](C:\Users\dell\AppData\Roaming\Typora\typora-user-images\image-20211212122519265.png)
-
-
+![image-bm-properties](https://github.com/whulzz1993/BinderHackDemo/blob/main/image-tmp/image-bm-properties.png)
 
 该文件中定义了BinderCareEntry="java class name"
 
